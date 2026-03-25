@@ -1,0 +1,128 @@
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    background-color: #f4f6f9;
+    margin-bottom: 60px;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Cards */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-weight: bold;
+    padding: 15px;
+    transition: 0.3s;
+}
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+/* Card Colors */
+.col-md-3:nth-child(1) .card {
+    background: #e8f6ff;
+}
+
+.col-md-3:nth-child(2) .card {
+    background: #eafaf1;
+}
+
+.col-md-3:nth-child(3) .card {
+    background: #fef9e7;
+}
+
+.col-md-3:nth-child(4) .card {
+    background: #fdecea;
+}
+
+/* Chart Containers */
+.chart-box {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    height: 320px;
+    position: relative;
+}
+
+    /* Make canvas fill the box */
+    .chart-box canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+/* Loader */
+#loader {
+    margin-top: 20px;
+}
+
+/* Alerts */
+.alert {
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+/* Remove blue selection */
+::selection {
+    background: transparent;
+}
+
+/* Headings */
+h5 {
+    text-align: center;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+
+#loaderOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    z-index: 9999;
+    text-align: center;
+    padding-top: 200px;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
