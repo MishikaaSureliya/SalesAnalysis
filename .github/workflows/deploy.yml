@@ -13,13 +13,16 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
+    - name: Restore
+      run: dotnet restore SalesAnalysis.csproj
+
     - name: Build
-      run: dotnet build SalesAnalysis/SalesAnalysis.csproj --configuration Release
+      run: dotnet build SalesAnalysis.csproj --configuration Release
 
     - name: Publish
-      run: dotnet publish SalesAnalysis/SalesAnalysis.csproj -c Release -o SalesAnalysis/publish
+      run: dotnet publish SalesAnalysis.csproj -c Release -o publish
 
     - name: Deploy to IIS
       run: |
-        xcopy SalesAnalysis\publish C:\inetpub\wwwroot\SalesPrediction /E /I /Y
+        xcopy publish C:\inetpub\wwwroot\SalesPrediction /E /I /Y
         iisreset
