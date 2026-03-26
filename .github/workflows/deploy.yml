@@ -22,28 +22,22 @@ jobs:
     - name: Publish project
       run: dotnet publish -c Release -o publish
 
-    - name: Stop IIS App Pool
+    - name: Enable app_offline
       shell: powershell
       run: |
-        Import-Module WebAdministration
-        if (Get-WebAppPoolState -Name "SalesPrediction" -ErrorAction SilentlyContinue) {
-            Stop-WebAppPool -Name "SalesPrediction"
-        }
+        New-Item "C:\inetpub\wwwroot\SalesPrediction\app_offline.htm" -ItemType File -Force
 
     - name: Clean IIS Folder
       shell: powershell
       run: |
-        if (Test-Path "C:\inetpub\wwwroot\SalesPrediction") {
-            Get-ChildItem "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-        }
+        Get-ChildItem "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Exclude "app_offline.htm" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     - name: Copy Files to IIS
       shell: powershell
       run: |
         Copy-Item -Path "publish\*" -Destination "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force
 
-    - name: Start IIS App Pool
+    - name: Disable app_offline
       shell: powershell
       run: |
-        Import-Module WebAdministration
-        Start-WebAppPool -Name "SalesPrediction"
+        Remove-Item "C:\inetpub\wwwroot\SalesPrediction\app_offline.htm" -Force
