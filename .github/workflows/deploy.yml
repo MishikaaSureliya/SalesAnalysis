@@ -24,5 +24,5 @@ jobs:
 
     - name: Deploy to IIS
       run: |
-        xcopy publish C:\inetpub\wwwroot\SalesPrediction /E /I /Y
+        xcopy publish C:\inetpub\wwwroot\SalesPrediction /E /I /Y /Q /C /R /K
         iisreset
