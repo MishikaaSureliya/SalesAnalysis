@@ -1,4 +1,4 @@
-name: Build and Deploy to IIS
+name: .NET CI/CD
 
 on:
   push:
@@ -10,14 +10,58 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+    # Checkout
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-    - name: Build Project
-      run: dotnet build --configuration Release
+    # Restore
+    - name: Restore dependencies
+      run: dotnet restore
 
-    - name: Publish Project
+    # Build
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
+
+    # Publish
+    - name: Publish project
       run: dotnet publish -c Release -o publish
 
-    - name: Deploy to IIS
-      run: robocopy publish C:\inetpub\wwwroot\SalesPrediction /E /MIR /R:1 /W:1
+    # Ensure IIS Folder Exists
+    - name: Ensure IIS Folder Exists
+      shell: powershell
+      run: |
+        if (!(Test-Path "C:\inetpub\wwwroot\SalesPrediction")) {
+            New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\SalesPrediction"
+        }
+
+    # Stop IIS Site
+    - name: Stop IIS Site
+      shell: powershell
+      run: |
+        Import-Module WebAdministration
+        if (Get-Website -Name "SalesPrediction" -ErrorAction SilentlyContinue) {
+            Stop-WebSite -Name "SalesPrediction"
+        }
+
+    # Clean IIS Folder
+    - name: Clean IIS Folder
+      shell: powershell
+      run: |
+        if (Test-Path "C:\inetpub\wwwroot\SalesPrediction") {
+            Get-ChildItem "C:\inetpub\wwwroot\SalesPrediction" -Recurse | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        }
+
+    # Copy Files
+    - name: Copy Files to IIS
+      shell: powershell
+      run: |
+        Copy-Item -Path "publish\*" -Destination "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force
+
+    # Start IIS Site
+    - name: Start IIS Site
+      shell: powershell
+      run: |
+        Import-Module WebAdministration
+        if (Get-Website -Name "SalesPrediction" -ErrorAction SilentlyContinue) {
+            Start-WebSite -Name "SalesPrediction"
+        }
