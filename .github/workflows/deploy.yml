@@ -22,21 +22,22 @@ jobs:
     - name: Publish project
       run: dotnet publish -c Release -o publish
 
-    - name: Ensure IIS Folder Exists
+    - name: Enable app_offline
       shell: powershell
       run: |
-        if (!(Test-Path "C:\inetpub\wwwroot\SalesPrediction")) {
-            New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\SalesPrediction"
-        }
+        New-Item "C:\inetpub\wwwroot\SalesPrediction\app_offline.htm" -ItemType File -Force
 
     - name: Clean IIS Folder
       shell: powershell
       run: |
-        if (Test-Path "C:\inetpub\wwwroot\SalesPrediction") {
-            Get-ChildItem "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-        }
+        Get-ChildItem "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Exclude "app_offline.htm" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     - name: Copy Files to IIS
       shell: powershell
       run: |
         Copy-Item -Path "publish\*" -Destination "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force
+
+    - name: Disable app_offline
+      shell: powershell
+      run: |
+        Remove-Item "C:\inetpub\wwwroot\SalesPrediction\app_offline.htm" -Force
