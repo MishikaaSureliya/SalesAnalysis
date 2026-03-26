@@ -20,7 +20,4 @@ jobs:
       run: dotnet publish -c Release -o publish
 
     - name: Deploy to IIS
-      run: |
-        iisreset /stop
-        robocopy publish C:\inetpub\wwwroot\SalesPrediction /E /MIR /R:1 /W:1
-        iisreset /start
+      run: robocopy publish C:\inetpub\wwwroot\SalesPrediction /E /MIR /R:1 /W:1
