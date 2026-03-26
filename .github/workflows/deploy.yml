@@ -1,4 +1,4 @@
-name: Build and Deploy to IIS
+name: .NET CI/CD
 
 on:
   push:
@@ -10,17 +10,33 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-    - name: Build
-      run: dotnet build --configuration Release
+    - name: Restore dependencies
+      run: dotnet restore
 
-    - name: Publish
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish project
       run: dotnet publish -c Release -o publish
 
-    - name: Deploy to IIS
+    - name: Ensure IIS Folder Exists
+      shell: powershell
       run: |
-        net stop w3svc
-        robocopy publish C:\inetpub\wwwroot\SalesPrediction /E /MIR
-        net start w3svc
+        if (!(Test-Path "C:\inetpub\wwwroot\SalesPrediction")) {
+            New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\SalesPrediction"
+        }
+
+    - name: Clean IIS Folder
+      shell: powershell
+      run: |
+        if (Test-Path "C:\inetpub\wwwroot\SalesPrediction") {
+            Get-ChildItem "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
+    - name: Copy Files to IIS
+      shell: powershell
+      run: |
+        Copy-Item -Path "publish\*" -Destination "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force
