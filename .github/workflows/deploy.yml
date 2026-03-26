@@ -13,14 +13,19 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Build
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Build Project
       run: dotnet build --configuration Release
 
-    - name: Publish
+    - name: Publish Project
       run: dotnet publish -c Release -o publish
 
     - name: Deploy to IIS
       run: |
-        net stop w3svc
-        robocopy publish C:\inetpub\wwwroot\SalesPrediction /E /MIR
-        net start w3svc
+        iisreset /stop
+        robocopy publish C:\inetpub\wwwroot\SalesPrediction /E /MIR /R:1 /W:1
+        iisreset /start
