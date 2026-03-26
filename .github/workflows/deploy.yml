@@ -1,4 +1,4 @@
-name: Deploy SalesAnalysis to IIS
+name: Build and Deploy to IIS
 
 on:
   push:
@@ -13,16 +13,14 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Restore
-      run: dotnet restore SalesAnalysis.csproj
-
     - name: Build
-      run: dotnet build SalesAnalysis.csproj --configuration Release
+      run: dotnet build --configuration Release
 
     - name: Publish
-      run: dotnet publish SalesAnalysis.csproj -c Release -o publish
+      run: dotnet publish -c Release -o publish
 
     - name: Deploy to IIS
       run: |
-        xcopy publish C:\inetpub\wwwroot\SalesPrediction /E /I /Y /Q /C /R /K
-        iisreset
+        net stop w3svc
+        robocopy publish C:\inetpub\wwwroot\SalesPrediction /E /MIR
+        net start w3svc
