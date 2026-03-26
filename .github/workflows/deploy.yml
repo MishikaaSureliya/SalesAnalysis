@@ -22,11 +22,12 @@ jobs:
     - name: Publish project
       run: dotnet publish -c Release -o publish
 
-    - name: Ensure IIS Folder Exists
+    - name: Stop IIS App Pool
       shell: powershell
       run: |
-        if (!(Test-Path "C:\inetpub\wwwroot\SalesPrediction")) {
-            New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\SalesPrediction"
+        Import-Module WebAdministration
+        if (Get-WebAppPoolState -Name "SalesPrediction" -ErrorAction SilentlyContinue) {
+            Stop-WebAppPool -Name "SalesPrediction"
         }
 
     - name: Clean IIS Folder
@@ -40,3 +41,9 @@ jobs:
       shell: powershell
       run: |
         Copy-Item -Path "publish\*" -Destination "C:\inetpub\wwwroot\SalesPrediction" -Recurse -Force
+
+    - name: Start IIS App Pool
+      shell: powershell
+      run: |
+        Import-Module WebAdministration
+        Start-WebAppPool -Name "SalesPrediction"
